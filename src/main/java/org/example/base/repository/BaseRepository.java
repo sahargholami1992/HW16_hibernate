@@ -13,4 +13,7 @@ public interface BaseRepository<ID extends Serializable, T extends BaseEntity<ID
     Collection<T> findAll();
     boolean existByID(ID id);
     long count();
+    void commitTransaction();
+
+    void beginTransaction();
 }

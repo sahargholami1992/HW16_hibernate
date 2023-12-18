@@ -15,8 +15,10 @@ public abstract class BaseRepositoryImpl<ID extends Serializable,T extends BaseE
     protected final EntityManager entityManager;
     @Override
     public T saveOrUpdate(T entity) {
+        beginTransaction();
         if (entity.getId()==null) entityManager.persist(entity);
         else entity = entityManager.merge(entity);
+        commitTransaction();
         return entity;
     }
 
@@ -60,5 +62,16 @@ public abstract class BaseRepositoryImpl<ID extends Serializable,T extends BaseE
                 "select count(e) from " + getEntityClass().getSimpleName() + " e",
                 Long.class
         ).getSingleResult();
+    }
+    @Override
+    public void commitTransaction() {
+        if (entityManager.getTransaction().isActive())
+            entityManager.getTransaction().commit();
+    }
+    @Override
+    public void beginTransaction() {
+        if(!entityManager.getTransaction().isActive()){
+            entityManager.getTransaction().begin();
+        }
     }
 }
