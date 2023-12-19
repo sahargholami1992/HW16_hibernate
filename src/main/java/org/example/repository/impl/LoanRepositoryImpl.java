@@ -40,13 +40,14 @@ public class LoanRepositoryImpl extends BaseRepositoryImpl<Integer, Loan>
     }
 
     @Override
-    public Loan findByTuition(String nationalCode,String term) {
+    public Loan findByTuition(String nationalCode,int year) {
         try {
             TypedQuery<Loan> query = entityManager.createQuery(
-                    "select l from Loan l where l.student.nationalCode = :nationalCode and l.loanType = 'TUITION' and l.student.currentTerm = :term ",
+                    "select l from Loan l where l.student.nationalCode = :nationalCode and l.loanType = :loanType and l.loanGetYear = :year ",
                     Loan.class);
             query.setParameter("nationalCode",nationalCode);
-            query.setParameter("term",term);
+            query.setParameter("loanType",LoanType.TUITION);
+            query.setParameter("year",year);
             return query.getSingleResult();
         }catch (Exception e){
             return null;
@@ -55,13 +56,14 @@ public class LoanRepositoryImpl extends BaseRepositoryImpl<Integer, Loan>
     }
 
     @Override
-    public Loan findByEducational(String nationalCode,String term) {
+    public Loan findByEducational(String nationalCode,int year) {
         try {
             TypedQuery<Loan> query = entityManager.createQuery(
-                    "select l from Loan l where l.student.nationalCode = :nationalCode and l.loanType = 'EDUCATIONAL' and l.student.currentTerm = :term",
+                    "select l from Loan l where l.student.nationalCode = :nationalCode and l.loanType = :loanType and l.loanGetYear = :year",
                     Loan.class);
             query.setParameter("nationalCode",nationalCode);
-            query.setParameter("term",term);
+            query.setParameter("loanType",LoanType.TUITION);
+            query.setParameter("year",year);
             return query.getSingleResult();
         }catch (Exception e){
             return null;

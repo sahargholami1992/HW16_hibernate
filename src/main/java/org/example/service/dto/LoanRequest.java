@@ -4,6 +4,7 @@ import lombok.*;
 import org.example.entity.enumuration.LoanType;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,7 +17,8 @@ public class LoanRequest implements Serializable {
 //    private int ccv2;
 //    private String CardExpirationDate;
     private LoanType loanType;
-    private String term;
+    private Date currentTime;
+    private int year;
 //    private String city;
 //    private int housingRentalNumber;
 //    private String address;

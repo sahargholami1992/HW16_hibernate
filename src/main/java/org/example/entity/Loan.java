@@ -7,6 +7,7 @@ import org.example.entity.enumuration.LoanAmountOfEducationLevel;
 import org.example.entity.enumuration.LoanType;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -32,6 +33,7 @@ public class Loan extends BaseEntity<Integer> {
     private int housingRentalNumber;
     private String address;
     private String term;
+    private int loanGetYear;
 
     @Override
     public String toString() {

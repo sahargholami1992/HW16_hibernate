@@ -11,8 +11,8 @@ import java.util.Date;
 
 public interface LoanService extends BaseService<Integer, Loan> {
     Collection<Loan> findAllByNationalCode(String nationalCode);
-    void applyLoan(LoanRequest loanRequest, Date currentDate);
+    void applyLoan(LoanRequest loanRequest);
     long findByBankCard(Loan loan,String cardNumber);
-    void isValidDateToGetLoan(int year, Date currentTime);
+    boolean isValidDateToGetLoan(int year, Date currentTime);
 
 }
