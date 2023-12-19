@@ -16,8 +16,6 @@ import java.util.Date;
 @Getter
 @Setter
 public class StudentRegistrationDTO implements Serializable {
-
-
     private String firstName;
     private String lastName;
     private String fatherName;
@@ -31,7 +29,6 @@ public class StudentRegistrationDTO implements Serializable {
     @Enumerated(EnumType.STRING)
     private UniversityType universityType;
     private int entranceYear;
-    private String currentTerm;
     @Enumerated(EnumType.STRING)
     private LoanAmountOfEducationLevel educationLevel;
     private boolean isMarried;

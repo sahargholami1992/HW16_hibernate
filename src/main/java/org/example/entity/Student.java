@@ -34,7 +34,6 @@ public class Student extends BaseEntity<Integer> {
     @Enumerated(EnumType.STRING)
     private UniversityType universityType;
     private int entranceYear;
-    private String currentTerm;
     @Enumerated(EnumType.STRING)
     private LoanAmountOfEducationLevel educationLevel;
     private boolean isMarried;

@@ -35,11 +35,11 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
     }
 
     @Override
-    public void applyLoan(LoanRequest loanRequest,Date currentDate) {
+    public void applyLoan(LoanRequest loanRequest) {
         Student student = studentService.findByNationalCode(loanRequest.getNationalCode());
-        if (deactivationLoanRequest(student,currentDate)){
+        if (activationLoanRequest(student,loanRequest.getCurrentTime())){
             Loan loan = new Loan();
-            loan.setTerm(loanRequest.getTerm());
+            loan.setLoanGetYear(loanRequest.getYear());
             loanRequest(loanRequest,student,loan);
         }else System.out.println("You have graduated");
     }
@@ -91,7 +91,7 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
     }
 
     private void processEducationalLoanRequest(Student student,Loan loan) {
-        if (repository.findByEducational(student.getNationalCode(),loan.getTerm())==null){
+        if (repository.findByEducational(student.getNationalCode(),loan.getLoanGetYear())==null){
             loan.setStudent(student);
             loan.setLoanType(LoanType.EDUCATIONAL);
             loan.setEducationLevel(student.getEducationLevel());
@@ -103,7 +103,7 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
     }
 
     private void processTuitionLoanRequest(Student student,Loan loan) {
-        if (repository.findByTuition(student.getNationalCode(),loan.getTerm())==null){
+        if (repository.findByTuition(student.getNationalCode(),loan.getLoanGetYear())==null){
             if (!student.getUniversityType().equals(UniversityType.DOLLATI_ROOZANEH)){
                 loan.setStudent(student);
                 loan.setLoanType(LoanType.TUITION);
@@ -116,9 +116,8 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
         }else System.out.println("you get tuition loan for this term");
 
     }
-    private boolean deactivationLoanRequest(Student student,Date currentDate){
+    private boolean activationLoanRequest(Student student,Date currentDate){
         LocalDate localDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
         switch (student.getEducationLevel()) {
             case ASSOCIATE ,BACHELOR_DISCONTINUOUS , MASTER_DISCONTINUOUS -> {
                 if (localDate.getYear()>=student.getEntranceYear()+2){
@@ -148,7 +147,7 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
         return true;
     }
     @Override
-    public void isValidDateToGetLoan(int year,Date currentTime) {
+    public boolean isValidDateToGetLoan(int year,Date currentTime) {
         Calendar instance = Calendar.getInstance();
         instance.set(year,10,23);
         Date date1 = instance.getTime();
@@ -158,9 +157,18 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
         Date date3 = instance.getTime();
         instance.add(Calendar.DATE,7);
         Date date4 = instance.getTime();
-        if (isDateWithinRange(currentTime, date1, date2)) System.out.println("The target date is within the range part1.");
-        else if (isDateWithinRange(currentTime, date3, date4)) System.out.println("The target date is within the range part 2.");
-        else System.out.println("The target date is outside the range.");
+        if (isDateWithinRange(currentTime, date1, date2)) {
+            System.out.println("The target date is within the range part1.");
+            return true;
+        }
+        else if (isDateWithinRange(currentTime, date3, date4)){
+            System.out.println("The target date is within the range part 2.");
+            return true;
+        }
+        else{
+            System.out.println("The target date is outside the range.");
+            return false;
+        }
     }
     private boolean isDateWithinRange(Date targetDate, Date startDate, Date endDate) {
         return !(targetDate.before(startDate) || targetDate.after(endDate));

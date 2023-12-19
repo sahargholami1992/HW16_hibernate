@@ -30,7 +30,6 @@ public class StudentServiceImpl extends BaseServiceImpl<Integer, Student, Studen
             student.setUniversityName(dto.getUniversityName());
             student.setUniversityType(dto.getUniversityType());
             student.setEntranceYear(dto.getEntranceYear());
-            student.setCurrentTerm(dto.getCurrentTerm());
             student.setEducationLevel(dto.getEducationLevel());
             student.setMarried(dto.isMarried());
             student.setSpouseNationalCode(dto.getSpouseNationalCode());
@@ -68,22 +67,19 @@ public class StudentServiceImpl extends BaseServiceImpl<Integer, Student, Studen
         return nationalCode.matches(pattern.pattern());
     }
     private String generatePassword() {
-         String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%&])(?=\\S+$).{8,}$";
+         String passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%&])(?=.*\\\\d).{8,}$";
+
         SecureRandom random = new SecureRandom();
 
         StringBuilder password = new StringBuilder();
 
         while (!password.toString().matches(passwordPattern)) {
             password.setLength(0);  // Clear the StringBuilder
-
-            // Generate your password logic here
-            // Example: Append random characters to the password
             for (int i = 0; i < 12; i++) {
-                char randomChar = (char) (random.nextInt(94) + 33); // ASCII printable characters
+                char randomChar = (char) (random.nextInt(94) + 33);
                 password.append(randomChar);
             }
         }
-
         return password.toString();
     }
 
