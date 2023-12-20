@@ -3,14 +3,14 @@ package org.example.menu;
 
 import org.example.entity.BankCard;
 import org.example.entity.Student;
-import org.example.entity.enumuration.LoanAmountOfEducationLevel;
+import org.example.entity.enumuration.BankName;
 import org.example.entity.enumuration.LoanType;
 import org.example.service.BankCardService;
 import org.example.service.LoanService;
-import org.example.service.StudentService;
 import org.example.service.dto.LoanRequest;
 import org.example.utill.ApplicationContext;
 import org.example.utill.SecurityContext;
+import org.example.utill.Validation;
 
 import java.time.ZoneId;
 import java.util.Date;
@@ -18,11 +18,11 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class LoanMenu {
-    private Scanner sc = new Scanner(System.in);
+    private final Scanner sc = new Scanner(System.in);
     LoanService loanService = ApplicationContext.getStudentLoanService();
     RepaymentLoanMenu repaymentLoanMenu = new RepaymentLoanMenu();
     BankCardService bankCardService  = ApplicationContext.getBankCardService();
-    MainMenu mainMenu = new MainMenu();
+
     public void studentLoanService() {
         System.out.println("1. bank card register");
         System.out.println("2.loan apply");
@@ -52,11 +52,29 @@ public class LoanMenu {
         BankCard bankCard = new BankCard();
         bankCard.setStudent(student);
         System.out.println("enter your bank name");
-        String bankName = sc.next();
+        String bank = """
+                1- TEJARAT
+                2- MASKAN
+                3- MELLI
+                4- REFAH
+                """;
+        System.out.println(bank);
+        int nameBank = input();
+        BankName bankName = null;
+        switch (nameBank) {
+            case 1 -> bankName = BankName.TEJARAT;
+            case 2 -> bankName = BankName.MASKAN;
+            case 3 -> bankName = BankName.MELLI;
+            case 4 -> bankName = BankName.REFAH;
+            default -> {
+                System.out.println("invalid input ! ");
+                bankCardsRegister();
+            }
+        }
         bankCard.setBankName(bankName);
         System.out.println("enter your card number");
         String cardNumber = sc.next();
-        while (!bankCardService.isValidCardNumberWithRegex(cardNumber)){
+        while (!Validation.isValidCardNumberWithRegex(cardNumber)){
             System.out.println("card number length in invalid");
             System.out.println("enter correct card number!!!!!");
             cardNumber = sc.next();
@@ -64,9 +82,14 @@ public class LoanMenu {
         bankCard.setCardNumber(cardNumber);
         System.out.println("enter ccv2");
         int ccv2 = input();
+        while (ccv2<99 || ccv2>9999){
+            System.out.println("ccv2 is not current");
+            ccv2 = input();
+        }
         bankCard.setCcv2(ccv2);
         System.out.println("enter Card Expiration Date");
         String cardExpirationDate = sc.next();
+
         bankCard.setCardExpirationDate(cardExpirationDate);
         bankCardService.registerBankCard(bankCard);
         System.out.println("your bank card register");
@@ -96,7 +119,7 @@ public class LoanMenu {
     public void loanRegister() {
         Date currentTime = SecurityContext.getCurrentTime();
         int year = currentTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getYear();
-        if (loanService.isValidDateToGetLoan(year,currentTime)){
+        if (Validation.isValidDateToGetLoan(year,currentTime)){
             Student student = SecurityContext.getCurrentStudent();
             String nationalCode = student.getNationalCode();
             System.out.println("enter your loan type");
@@ -121,6 +144,12 @@ public class LoanMenu {
             }
             System.out.println("enter your card number");
             String cardNumber = sc.next();
+            while (!Validation.isValidCardNumberWithRegex(cardNumber)){
+                System.out.println("card number length in invalid");
+                System.out.println("enter correct card number!!!!!");
+                cardNumber = sc.next();
+            }
+            if (bankCardService.findByStudent(student,cardNumber)== null) bankCardsRegister();
             LoanRequest loanRequest = new LoanRequest(nationalCode,cardNumber,type,currentTime,year);
             loanService.applyLoan(loanRequest);
             loanRegister();

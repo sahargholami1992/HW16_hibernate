@@ -40,13 +40,13 @@ public class LoanRepositoryImpl extends BaseRepositoryImpl<Integer, Loan>
     }
 
     @Override
-    public Loan findByTuition(String nationalCode,int year) {
+    public Loan findByLoanType(String nationalCode,int year,LoanType loanType) {
         try {
             TypedQuery<Loan> query = entityManager.createQuery(
                     "select l from Loan l where l.student.nationalCode = :nationalCode and l.loanType = :loanType and l.loanGetYear = :year ",
                     Loan.class);
             query.setParameter("nationalCode",nationalCode);
-            query.setParameter("loanType",LoanType.TUITION);
+            query.setParameter("loanType",loanType);
             query.setParameter("year",year);
             return query.getSingleResult();
         }catch (Exception e){
@@ -55,20 +55,6 @@ public class LoanRepositoryImpl extends BaseRepositoryImpl<Integer, Loan>
 
     }
 
-    @Override
-    public Loan findByEducational(String nationalCode,int year) {
-        try {
-            TypedQuery<Loan> query = entityManager.createQuery(
-                    "select l from Loan l where l.student.nationalCode = :nationalCode and l.loanType = :loanType and l.loanGetYear = :year",
-                    Loan.class);
-            query.setParameter("nationalCode",nationalCode);
-            query.setParameter("loanType",LoanType.TUITION);
-            query.setParameter("year",year);
-            return query.getSingleResult();
-        }catch (Exception e){
-            return null;
-        }
-    }
 
     @Override
     public Collection<Loan> findAllByNationalCode(String nationalCode) {

@@ -32,7 +32,7 @@ public class Loan extends BaseEntity<Integer> {
     private BankCard bankCard;
     private int housingRentalNumber;
     private String address;
-    private String term;
+//    private String term;
     private int loanGetYear;
 
     @Override
@@ -45,7 +45,6 @@ public class Loan extends BaseEntity<Integer> {
                 ", educationLevel=" + educationLevel +
                 ", housingRentalNumber=" + housingRentalNumber +
                 ", address='" + address + '\'' +
-                ", term='" + term + '\'' +
                 "} ";
     }
 }

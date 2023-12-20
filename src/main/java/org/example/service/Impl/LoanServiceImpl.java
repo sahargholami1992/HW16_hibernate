@@ -5,6 +5,7 @@ import org.example.base.service.BaseServiceImpl;
 import org.example.entity.*;
 import org.example.entity.enumuration.*;
 import org.example.repository.LoanRepository;
+import org.example.service.BankCardService;
 import org.example.service.LoanService;
 import org.example.service.StudentService;
 import org.example.service.dto.LoanRequest;
@@ -22,11 +23,14 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
                                implements LoanService {
 
     protected final StudentService studentService;
+    protected final BankCardService bankCardService;
 
 
-    public LoanServiceImpl(LoanRepository repository, StudentService studentService) {
+
+    public LoanServiceImpl(LoanRepository repository, StudentService studentService,BankCardService bankCardService) {
         super(repository);
         this.studentService=studentService;
+        this.bankCardService=bankCardService;
     }
 
     @Override
@@ -49,12 +53,15 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
         return repository.findByBankCard(loan,cardNumber);
     }
 
-    private BankCard extracted(Student student, Loan loan) {
+    public BankCard extracted(Student student,Loan loan) {
         for (BankCard bankCard: student.getBankCardList()) {
-                if (bankCard.getBankName().equals("tejarat")||bankCard.getBankName().equals("maskan") ||bankCard.getBankName().equals("melli") ||bankCard.getBankName().equals("refah")){
-                    bankCard.setBalance(loan.getAmount());
+                if (bankCard.getBankName().equals(BankName.REFAH)||bankCard.getBankName().equals(BankName.MASKAN) ||bankCard.getBankName().equals(BankName.MELLI) ||bankCard.getBankName().equals(BankName.TEJARAT)){
+                    bankCardService.deposit(loan.getAmount(), bankCard.getCardNumber());
                     return bankCard;
-                }else System.out.println("Your card number does not belong to these banks");
+                }else{
+                    System.out.println("Your card number does not belong to these banks");
+                    return null;
+                }
         }
         return null;
     }
@@ -83,7 +90,7 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
                 if (student.getCity().equals("tehran")) loan.setAmount(32000000);
                 else if (cities.contains(student.getCity())) loan.setAmount(26000000);
                 else loan.setAmount(19500000);
-                loan.setBankCard(extracted(student, loan));
+                loan.setBankCard(extracted(student,loan));
                 repository.saveOrUpdate(loan);
                 System.out.println("your request is accepted");
             }else System.out.println("this loan will not be awarded to you");
@@ -91,26 +98,28 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
     }
 
     private void processEducationalLoanRequest(Student student,Loan loan) {
-        if (repository.findByEducational(student.getNationalCode(),loan.getLoanGetYear())==null){
+        if (repository.findByLoanType(student.getNationalCode(),loan.getLoanGetYear(),LoanType.EDUCATIONAL)==null){
             loan.setStudent(student);
             loan.setLoanType(LoanType.EDUCATIONAL);
             loan.setEducationLevel(student.getEducationLevel());
             loan.setAmount(student.getEducationLevel().getEducational());
-            loan.setBankCard(extracted(student, loan));
+            loan.setBankCard(extracted(student,loan));
             repository.saveOrUpdate(loan);
             System.out.println("your request is accepted");
         }else System.out.println("you get educational loan for this term");
     }
 
     private void processTuitionLoanRequest(Student student,Loan loan) {
-        if (repository.findByTuition(student.getNationalCode(),loan.getLoanGetYear())==null){
+        if (repository.findByLoanType(student.getNationalCode(),loan.getLoanGetYear(),LoanType.TUITION)==null){
             if (!student.getUniversityType().equals(UniversityType.DOLLATI_ROOZANEH)){
                 loan.setStudent(student);
                 loan.setLoanType(LoanType.TUITION);
                 loan.setEducationLevel(student.getEducationLevel());
                 loan.setAmount(student.getEducationLevel().getTuition());
-                loan.setBankCard(extracted(student, loan));
+                loan.setBankCard(extracted(student,loan));
                 repository.saveOrUpdate(loan);
+
+
                 System.out.println("your request is accepted");
             }else System.out.println("this loan will not be awarded to you");
         }else System.out.println("you get tuition loan for this term");
@@ -146,33 +155,7 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
         }
         return true;
     }
-    @Override
-    public boolean isValidDateToGetLoan(int year,Date currentTime) {
-        Calendar instance = Calendar.getInstance();
-        instance.set(year,10,23);
-        Date date1 = instance.getTime();
-        instance.add(Calendar.DATE,7);
-        Date date2 = instance.getTime();
-        instance.set(year,2,14);
-        Date date3 = instance.getTime();
-        instance.add(Calendar.DATE,7);
-        Date date4 = instance.getTime();
-        if (isDateWithinRange(currentTime, date1, date2)) {
-            System.out.println("The target date is within the range part1.");
-            return true;
-        }
-        else if (isDateWithinRange(currentTime, date3, date4)){
-            System.out.println("The target date is within the range part 2.");
-            return true;
-        }
-        else{
-            System.out.println("The target date is outside the range.");
-            return false;
-        }
-    }
-    private boolean isDateWithinRange(Date targetDate, Date startDate, Date endDate) {
-        return !(targetDate.before(startDate) || targetDate.after(endDate));
-    }
+
 
 
 }
