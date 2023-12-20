@@ -2,19 +2,16 @@ package org.example.repository.impl;
 
 import org.example.base.repository.BaseRepositoryImpl;
 import org.example.entity.BankCard;
-
 import org.example.entity.Student;
 import org.example.repository.BankCardRepository;
-
-
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.util.List;
+
+
 
 public class BankCardRepositoryImpl extends BaseRepositoryImpl<Integer, BankCard>
                                  implements BankCardRepository {
-
 
     public BankCardRepositoryImpl(EntityManager entityManager) {
         super(entityManager);
@@ -50,4 +47,20 @@ public class BankCardRepositoryImpl extends BaseRepositoryImpl<Integer, BankCard
             return null;
         }
     }
+
+    @Override
+    public boolean findByCcv2AndDate(String cardNumber, int ccv2) {
+        try {
+            TypedQuery<Long> query =
+                    entityManager.createQuery(
+                    "select count(b) from BankCard b where b.cardNumber = :cardNumber  and b.ccv2 = :ccv2 "
+                    , Long.class);
+            query.setParameter("cardNumber",cardNumber);
+            query.setParameter("ccv2",ccv2);
+            return query.getSingleResult()>0;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
 }

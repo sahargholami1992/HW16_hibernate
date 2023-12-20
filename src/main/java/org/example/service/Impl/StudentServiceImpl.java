@@ -7,8 +7,6 @@ import org.example.service.StudentService;
 import org.example.service.dto.StudentRegistrationDTO;
 import org.example.utill.Validation;
 
-import java.security.SecureRandom;
-import java.util.regex.Pattern;
 
 public class StudentServiceImpl extends BaseServiceImpl<Integer, Student, StudentRepository>
                                implements StudentService {
@@ -18,13 +16,13 @@ public class StudentServiceImpl extends BaseServiceImpl<Integer, Student, Studen
 
     @Override
     public String studentRegister(StudentRegistrationDTO dto) {
-        if (Validation.isValidNationalCodeWithRegex(dto.getNationalCode())){
+        if (Validation.isValidNationalCodeAndPostalCodeWithRegex(dto.getNationalCode())){
             Student student = new Student();
             student.setFirstName(dto.getFirstName());
             student.setLastName(dto.getLastName());
             student.setFatherName(dto.getFatherName());
             student.setMotherName(dto.getMotherName());
-            student.setIdentityNumber(dto.getMotherName());
+            student.setIdentityNumber(dto.getIdentityNumber());
             student.setNationalCode(dto.getNationalCode());
             student.setBirthDate(dto.getBirthDate());
             student.setStudentId(dto.getStudentId());
@@ -39,7 +37,7 @@ public class StudentServiceImpl extends BaseServiceImpl<Integer, Student, Studen
             student.setHousingRentalNumber(dto.getHousingRentalNumber());
             student.setAddress(dto.getAddress());
             student.setPostalCode(dto.getPostalCode());
-            student.setPassword(Validation.generatePassword());
+            student.setPassword(Validation.generatePasswordddd());
             repository.saveOrUpdate(student);
             return student.getPassword();
         }else throw new RuntimeException("invalid nationalCode");

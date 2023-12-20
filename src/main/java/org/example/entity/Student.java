@@ -22,6 +22,7 @@ public class Student extends BaseEntity<Integer> {
     private String firstName;
     private String lastName;
     private String fatherName;
+    @Column(nullable = false)
     private String motherName;
     private String identityNumber;
     @Pattern(regexp = "^[0-9]{10}$",message = "invalid pattern")
@@ -44,7 +45,7 @@ public class Student extends BaseEntity<Integer> {
     private boolean stayInDorm;
     private int housingRentalNumber;
     private String address;
-    private int postalCode;
+    private String postalCode;
     private String password;
     @ToString.Exclude
     @OneToMany(mappedBy = "student")

@@ -24,16 +24,16 @@ public class LoanMenu {
     BankCardService bankCardService  = ApplicationContext.getBankCardService();
 
     public void studentLoanService() {
-        System.out.println("1. bank card register");
-        System.out.println("2.loan apply");
-        System.out.println("3.loan repayment");
-        System.out.println("4. back");
-        System.out.println("5. exit");
+        System.out.println("*************** user panel ******************");
+        System.out.println("1.bank card register");
+        System.out.println("2.loan service");
+        System.out.println("3.repayment service");
+        System.out.println("4.back");
+        System.out.println("5.exit");
         System.out.println("enter your select");
         int select;
         do {
             select = input();
-            sc.nextLine();
             switch (select) {
                 case 1 -> bankCardsRegister();
                 case 2 -> loanSystem();
@@ -46,6 +46,7 @@ public class LoanMenu {
                 default -> System.out.println("invalid select,enter a valid option");
             }
         }while (select !=5);
+        sc.close();
     }
     private void bankCardsRegister() {
         Student student = SecurityContext.getCurrentStudent();
@@ -73,7 +74,7 @@ public class LoanMenu {
         }
         bankCard.setBankName(bankName);
         System.out.println("enter your card number");
-        String cardNumber = sc.next();
+        String cardNumber = sc.nextLine();
         while (!Validation.isValidCardNumberWithRegex(cardNumber)){
             System.out.println("card number length in invalid");
             System.out.println("enter correct card number!!!!!");
@@ -87,15 +88,27 @@ public class LoanMenu {
             ccv2 = input();
         }
         bankCard.setCcv2(ccv2);
-        System.out.println("enter Card Expiration Date");
-        String cardExpirationDate = sc.next();
+        System.out.println("enter Card Expiration year");
+        int year = input();
+        while (year>3000 || year <1900){
+            System.out.println("it dose not current year!!");
+            year = input();
+        }
+        System.out.println("enter Card Expiration month");
+        int month = input();
+        while (month>13 || month <=0){
+            System.out.println("it dose not current month!!");
+            month = input();
+        }
 
+        Date cardExpirationDate = Validation.getDate(year, month, 1);
         bankCard.setCardExpirationDate(cardExpirationDate);
         bankCardService.registerBankCard(bankCard);
         System.out.println("your bank card register");
         studentLoanService();
     }
     public void loanSystem(){
+        System.out.println("************* loan receiving and display service *************");
         System.out.println("1- loan apply");
         System.out.println("2- your loans");
         System.out.println("3- back");
@@ -103,7 +116,6 @@ public class LoanMenu {
         int request ;
         do {
             request= input();
-            sc.nextLine();
             switch (request){
                 case 1 -> loanRegister();
                 case 2 -> findLoansByStudent();
@@ -119,44 +131,51 @@ public class LoanMenu {
     public void loanRegister() {
         Date currentTime = SecurityContext.getCurrentTime();
         int year = currentTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getYear();
-        if (Validation.isValidDateToGetLoan(year,currentTime)){
-            Student student = SecurityContext.getCurrentStudent();
-            String nationalCode = student.getNationalCode();
-            System.out.println("enter your loan type");
-            String loanS = """
+        Student student = SecurityContext.getCurrentStudent();
+        if (Validation.activationLoanRequest(student,currentTime)){
+            if (Validation.isValidDateToGetLoan(year,currentTime)){
+
+                String nationalCode = student.getNationalCode();
+                System.out.println("enter your loan type");
+                String loanS = """
                 1- TUITION
                 2- EDUCATIONAL
                 3- HOUSING_DEPOSIT
                 4 - back to loan system
                 """;
-            System.out.println(loanS);
-            int loanType = input();
-            LoanType type = null;
-            switch (loanType) {
-                case 1 -> type = LoanType.TUITION;
-                case 2 -> type = LoanType.EDUCATIONAL;
-                case 3 -> type = LoanType.HOUSING_DEPOSIT;
-                case 4 -> loanSystem();
-                default -> {
-                    System.out.println("invalid input ! ");
-                    loanRegister();
+                System.out.println(loanS);
+                int loanType = input();
+                LoanType type = null;
+                switch (loanType) {
+                    case 1 -> type = LoanType.TUITION;
+                    case 2 -> type = LoanType.EDUCATIONAL;
+                    case 3 -> type = LoanType.HOUSING_DEPOSIT;
+                    case 4 -> loanSystem();
+                    default -> {
+                        System.out.println("invalid input ! ");
+                        loanRegister();
+                    }
                 }
+                System.out.println("enter your card number");
+                String cardNumber = sc.nextLine();
+                while (!Validation.isValidCardNumberWithRegex(cardNumber)){
+                    System.out.println("card number length in invalid");
+                    System.out.println("enter correct card number!!!!!");
+                    cardNumber = sc.nextLine();
+                }
+                if (bankCardService.findByStudent(student,cardNumber)== null) bankCardsRegister();
+                LoanRequest loanRequest = new LoanRequest(nationalCode,cardNumber,type,currentTime,year);
+                loanService.applyLoan(loanRequest);
+                loanRegister();
+            }else {
+                System.out.println("The target date is outside the range.");
+                studentLoanService();
             }
-            System.out.println("enter your card number");
-            String cardNumber = sc.next();
-            while (!Validation.isValidCardNumberWithRegex(cardNumber)){
-                System.out.println("card number length in invalid");
-                System.out.println("enter correct card number!!!!!");
-                cardNumber = sc.next();
-            }
-            if (bankCardService.findByStudent(student,cardNumber)== null) bankCardsRegister();
-            LoanRequest loanRequest = new LoanRequest(nationalCode,cardNumber,type,currentTime,year);
-            loanService.applyLoan(loanRequest);
-            loanRegister();
         }else {
-            System.out.println("The target date is outside the range.");
+            System.out.println("You have graduated");
             studentLoanService();
         }
+
     }
     public Integer input() {
         int i;

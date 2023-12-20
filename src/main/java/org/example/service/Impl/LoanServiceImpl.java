@@ -9,13 +9,7 @@ import org.example.service.BankCardService;
 import org.example.service.LoanService;
 import org.example.service.StudentService;
 import org.example.service.dto.LoanRequest;
-
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 
@@ -24,8 +18,6 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
 
     protected final StudentService studentService;
     protected final BankCardService bankCardService;
-
-
 
     public LoanServiceImpl(LoanRepository repository, StudentService studentService,BankCardService bankCardService) {
         super(repository);
@@ -41,11 +33,9 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
     @Override
     public void applyLoan(LoanRequest loanRequest) {
         Student student = studentService.findByNationalCode(loanRequest.getNationalCode());
-        if (activationLoanRequest(student,loanRequest.getCurrentTime())){
             Loan loan = new Loan();
             loan.setLoanGetYear(loanRequest.getYear());
             loanRequest(loanRequest,student,loan);
-        }else System.out.println("You have graduated");
     }
 
     @Override
@@ -53,10 +43,9 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
         return repository.findByBankCard(loan,cardNumber);
     }
 
-    public BankCard extracted(Student student,Loan loan) {
+    public BankCard extracted(Student student) {
         for (BankCard bankCard: student.getBankCardList()) {
                 if (bankCard.getBankName().equals(BankName.REFAH)||bankCard.getBankName().equals(BankName.MASKAN) ||bankCard.getBankName().equals(BankName.MELLI) ||bankCard.getBankName().equals(BankName.TEJARAT)){
-                    bankCardService.deposit(loan.getAmount(), bankCard.getCardNumber());
                     return bankCard;
                 }else{
                     System.out.println("Your card number does not belong to these banks");
@@ -90,8 +79,9 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
                 if (student.getCity().equals("tehran")) loan.setAmount(32000000);
                 else if (cities.contains(student.getCity())) loan.setAmount(26000000);
                 else loan.setAmount(19500000);
-                loan.setBankCard(extracted(student,loan));
+                loan.setBankCard(extracted(student));
                 repository.saveOrUpdate(loan);
+                bankCardService.deposit(loan.getAmount(), loan.getBankCard().getCardNumber());
                 System.out.println("your request is accepted");
             }else System.out.println("this loan will not be awarded to you");
         }else System.out.println("this loan will not be awarded to you");
@@ -103,8 +93,9 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
             loan.setLoanType(LoanType.EDUCATIONAL);
             loan.setEducationLevel(student.getEducationLevel());
             loan.setAmount(student.getEducationLevel().getEducational());
-            loan.setBankCard(extracted(student,loan));
+            loan.setBankCard(extracted(student));
             repository.saveOrUpdate(loan);
+            bankCardService.deposit(loan.getAmount(), loan.getBankCard().getCardNumber());
             System.out.println("your request is accepted");
         }else System.out.println("you get educational loan for this term");
     }
@@ -116,44 +107,13 @@ public class LoanServiceImpl extends BaseServiceImpl<Integer, Loan, LoanReposito
                 loan.setLoanType(LoanType.TUITION);
                 loan.setEducationLevel(student.getEducationLevel());
                 loan.setAmount(student.getEducationLevel().getTuition());
-                loan.setBankCard(extracted(student,loan));
+                loan.setBankCard(extracted(student));
                 repository.saveOrUpdate(loan);
-
-
+                bankCardService.deposit(loan.getAmount(), loan.getBankCard().getCardNumber());
                 System.out.println("your request is accepted");
             }else System.out.println("this loan will not be awarded to you");
         }else System.out.println("you get tuition loan for this term");
 
-    }
-    private boolean activationLoanRequest(Student student,Date currentDate){
-        LocalDate localDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        switch (student.getEducationLevel()) {
-            case ASSOCIATE ,BACHELOR_DISCONTINUOUS , MASTER_DISCONTINUOUS -> {
-                if (localDate.getYear()>=student.getEntranceYear()+2){
-                    return false;
-                }
-            }
-            case BACHELOR -> {
-                if (localDate.getYear()>=student.getEntranceYear()+4) {
-                    return false;
-                }
-            }
-//            case BACHELOR_DISCONTINUOUS ->
-            case MASTER -> {
-                if (localDate.getYear()>=student.getEntranceYear()+6) {
-                    return false;
-                }
-            }
-//            case MASTER_DISCONTINUOUS ->
-            case DOCTORATE , PHD-> {
-                if (localDate.getYear()>=student.getEntranceYear()+5) {
-                    return false;
-                }
-            }
-//            case PHD ->
-            default -> throw new IllegalArgumentException("Unsupported level type: " + student.getEducationLevel());
-        }
-        return true;
     }
 
 

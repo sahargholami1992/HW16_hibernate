@@ -7,10 +7,6 @@ import org.example.entity.Student;
 import org.example.entity.enumuration.InstallmentStatus;
 import org.example.repository.ProcessPaymentRepository;
 import org.example.service.ProcessPaymentService;
-import org.example.service.LoanService;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,10 +16,10 @@ import java.util.List;
 public class ProcessPaymentServiceImpl extends BaseServiceImpl<Integer, ProcessPayment, ProcessPaymentRepository>
                                implements ProcessPaymentService {
 
-    private final LoanService loanService;
-    public ProcessPaymentServiceImpl(ProcessPaymentRepository repository, LoanService loanService) {
+
+    public ProcessPaymentServiceImpl(ProcessPaymentRepository repository) {
         super(repository);
-        this.loanService = loanService;
+
     }
 
 
@@ -45,7 +41,7 @@ public class ProcessPaymentServiceImpl extends BaseServiceImpl<Integer, ProcessP
                 repayment.setNumberOfInstallment(i);
                 repository.saveOrUpdate(repayment);
                 installments.add(repayment);
-                dueDate = getDate(repayment);
+                dueDate = getInstallmentDate(repayment);
             }
             if ( i >= 12 && i < 24) {
                 repayment.setInstallmentAmount(coefficient*2);
@@ -53,7 +49,7 @@ public class ProcessPaymentServiceImpl extends BaseServiceImpl<Integer, ProcessP
                 repayment.setNumberOfInstallment(i);
                 repository.saveOrUpdate(repayment);
                 installments.add(repayment);
-                dueDate = getDate(repayment);
+                dueDate = getInstallmentDate(repayment);
             }
             if ( i >= 24 && i < 36) {
                 repayment.setInstallmentAmount(coefficient*4);
@@ -61,7 +57,7 @@ public class ProcessPaymentServiceImpl extends BaseServiceImpl<Integer, ProcessP
                 repayment.setNumberOfInstallment(i);
                 repository.saveOrUpdate(repayment);
                 installments.add(repayment);
-                dueDate = getDate(repayment);
+                dueDate = getInstallmentDate(repayment);
             }
             if ( i >= 36 && i < 48) {
                 repayment.setInstallmentAmount(coefficient*8);
@@ -69,7 +65,7 @@ public class ProcessPaymentServiceImpl extends BaseServiceImpl<Integer, ProcessP
                 repayment.setNumberOfInstallment(i);
                 repository.saveOrUpdate(repayment);
                 installments.add(repayment);
-                dueDate = getDate(repayment);
+                dueDate = getInstallmentDate(repayment);
             }
             if (i >= 48) {
                 repayment.setInstallmentAmount(coefficient*16);
@@ -77,13 +73,13 @@ public class ProcessPaymentServiceImpl extends BaseServiceImpl<Integer, ProcessP
                 repayment.setNumberOfInstallment(i);
                 repository.saveOrUpdate(repayment);
                 installments.add(repayment);
-                dueDate = getDate(repayment);
+                dueDate = getInstallmentDate(repayment);
             }
         }
         return installments;
     }
 
-    private static Date getDate(ProcessPayment repayment) {
+    private static Date getInstallmentDate(ProcessPayment repayment) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(repayment.getDueDate());
         calendar.add(Calendar.MONTH, 1);

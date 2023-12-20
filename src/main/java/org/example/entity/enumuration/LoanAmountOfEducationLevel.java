@@ -1,8 +1,6 @@
 package org.example.entity.enumuration;
 
 
-
-
 public enum LoanAmountOfEducationLevel {
     ASSOCIATE(1900000,1300000),
     BACHELOR(1900000,1300000),
@@ -18,20 +16,11 @@ public enum LoanAmountOfEducationLevel {
         this.tuition=tuition;
         this.educational=educational;
     }
-
     public double getTuition() {
         return tuition;
     }
-
-    public void setTuition(double tuition) {
-        this.tuition = tuition;
-    }
-
     public double getEducational() {
         return educational;
     }
 
-    public void setEducational(double educational) {
-        this.educational = educational;
-    }
 }

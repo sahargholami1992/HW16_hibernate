@@ -19,7 +19,6 @@ public class ApplicationContext {
     private static final StudentRepository STUDENT_REPOSITORY;
     private static final ProcessPaymentRepository PROCESS_PAYMENT_REPOSITORY;
 
-//    private static final InstallmentRepository INSTALLMENT_REPOSITORY;
     private static final BankCardRepository BANK_CARD_REPOSITORY;
 
     private static final LoanService STUDENT_LOAN_SERVICE;
@@ -36,12 +35,9 @@ public class ApplicationContext {
         STUDENT_SERVICE = new StudentServiceImpl(STUDENT_REPOSITORY);
         BANK_CARD_SERVICE = new BankCardServiceImpl(BANK_CARD_REPOSITORY);
         STUDENT_LOAN_SERVICE = new LoanServiceImpl(STUDENT_LOAN_REPOSITORY,STUDENT_SERVICE,BANK_CARD_SERVICE);
-        PROCESS_PAYMENT_SERVICE = new ProcessPaymentServiceImpl(PROCESS_PAYMENT_REPOSITORY,STUDENT_LOAN_SERVICE);
-
-
+        PROCESS_PAYMENT_SERVICE = new ProcessPaymentServiceImpl(PROCESS_PAYMENT_REPOSITORY);
 
     }
-
 
     public static LoanService getStudentLoanService(){
         return STUDENT_LOAN_SERVICE;
@@ -49,7 +45,6 @@ public class ApplicationContext {
     public static StudentService getStudentService(){
         return STUDENT_SERVICE;
     }
-
     public static BankCardService getBankCardService(){
         return BANK_CARD_SERVICE;
     }

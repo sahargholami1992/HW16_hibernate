@@ -22,21 +22,25 @@ public class RepaymentLoanMenu {
     ProcessPaymentService processPaymentService = ApplicationContext.getProcessPaymentService();
     BankCardService bankCardService  = ApplicationContext.getBankCardService();
     public void paymentSystem(){
+        System.out.println("************* payment service and display loan installment *************");
         System.out.println("enter your select");
         System.out.println("1. register payment");
-        System.out.println("2. exit system");
+        System.out.println("2. back");
         int choice;
         do {
             choice = input();
             switch (choice) {
                 case 1 -> registerRepayment();
-                case 2 -> System.out.println("exiting the program!! see you later!");
+                case 2 -> {
+                    MainMenu mainMenu = new MainMenu();
+                    mainMenu.mainMenu();
+                }
                 default -> {
                     System.out.println("invalid select,enter a valid option");
                     paymentSystem();
                 }
             }
-        }while (choice != 2);
+        }while (choice != 3);
     }
     public void registerRepayment() {
         Student student = SecurityContext.getCurrentStudent();
@@ -45,16 +49,22 @@ public class RepaymentLoanMenu {
             loanService.findAllByNationalCode(student.getNationalCode()).forEach(System.out::println);
             System.out.println("enter loan id");
             int loanId = input();
-            Loan loan = loanService.load(loanId);
-            SecurityContext.fillContext(loan);
-            if (processPaymentService.findByLoan(loanId).size()==0){
-                processPaymentService.generateInstallment(loan);
-                System.out.println("your installments for this loan register");
-                typeOfRepayment();
+            if (loanService.load(loanId)!=null){
+                Loan loan = loanService.load(loanId);
+                SecurityContext.fillContext(loan);
+                if (processPaymentService.findByLoan(loanId).size()==0){
+                    processPaymentService.generateInstallment(loan);
+                    System.out.println("your installments for this loan register");
+                    typeOfRepayment();
+                }else{
+                    System.out.println("your installments for this loan has already been registered!!!");
+                    typeOfRepayment();
+                }
             }else{
-                System.out.println("your installments for this loan has already been registered!!!");
-                typeOfRepayment();
+                System.out.println("id does not exist!!!!!");
+                paymentSystem();
             }
+
         }else {
             System.out.println("You can not repayment your loan you have not graduated yet!!!");
             paymentSystem();
@@ -87,23 +97,44 @@ public class RepaymentLoanMenu {
         }
         System.out.println("enter ccv2");
         int ccv2 = input();
-        System.out.println("enter Card Expiration Date");
-        String cardExpirationDate = sc.next();
-        if (loanService.findByBankCard(loan,cardNumber)==1){
-            processPaymentService.findByPending(loan).stream()
-                    .map(row -> Arrays.stream(row)
-                            .map(Object::toString)
-                            .collect(Collectors.joining(" ")))
-                    .forEach(System.out::println);
-            System.out.println("choose number Of Installment ");
-            int numberOfInstallment = input();
-            processPaymentService.updateInstallmentStatus(loan, numberOfInstallment);
-            System.out.println("your installment update ");
-            typeOfRepayment();
+        while (ccv2<99 || ccv2>9999){
+            System.out.println("ccv2 is not current");
+            ccv2 = input();
+        }
+        System.out.println("enter Card Expiration year");
+        int year = input();
+        while (year>3000 || year <1900){
+            System.out.println("it dose not current year!!");
+            year = input();
+        }
+        System.out.println("enter Card Expiration month");
+        int month = input();
+        while (month>13 || month <=0){
+            System.out.println("it dose not current month!!");
+            month = input();
+        }
+        Date cardExpirationDate = Validation.getDate(year, month, 1);
+        if(bankCardService.findByCcv2AndDate(cardNumber,ccv2)){
+            if (loanService.findByBankCard(loan,cardNumber)==1){
+                processPaymentService.findByPending(loan).stream()
+                        .map(row -> Arrays.stream(row)
+                                .map(Object::toString)
+                                .collect(Collectors.joining(" ")))
+                        .forEach(System.out::println);
+                System.out.println("choose number Of Installment ");
+                int numberOfInstallment = input();
+                processPaymentService.updateInstallmentStatus(loan, numberOfInstallment);
+                System.out.println("your installment update ");
+                typeOfRepayment();
+            }else {
+                System.out.println("your card number is not match");
+                typeOfRepayment();
+            }
         }else {
-            System.out.println("your card number is not match");
+            System.out.println("this card does not exit");
             typeOfRepayment();
         }
+
     }
 
     private void unpaidInstallments() {
@@ -138,7 +169,7 @@ public class RepaymentLoanMenu {
                 return i;
             } catch (InputMismatchException in) {
                 sc.nextLine();
-                System.out.println("PLEASE ENTER VALID NUMBER !");
+                System.out.println(" enter valid number !");
             }
         }
     }

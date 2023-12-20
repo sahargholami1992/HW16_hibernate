@@ -29,21 +29,7 @@ public class SecurityContext {
         currentTime = date;
     }
 
-    public static void logout() {
-        currentStudent = null;
-    }
 
 
-    public static boolean isAnyoneAuthenticated() {
-        return currentStudent != null;
-    }
-
-    public static Integer getCurrentUserId() {
-        return currentStudent.getId();
-    }
-
-//    public static String getCurrentUserType() {
-//        return currentUser.getUserType();
-//    }
 
 }

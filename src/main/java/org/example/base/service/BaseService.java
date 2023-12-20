@@ -4,7 +4,7 @@ import org.example.base.entity.BaseEntity;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Optional;
+
 
 public interface BaseService<ID extends Serializable,T extends BaseEntity<ID>> {
     T saveOrUpdate(T entity);

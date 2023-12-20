@@ -6,6 +6,7 @@ import org.example.base.repository.BaseRepository;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -27,7 +28,8 @@ public class BaseServiceImpl<ID extends Serializable, T extends BaseEntity<ID>,
 
     @Override
     public T load(ID id) {
-       return repository.findById(id).orElse(null);
+        Optional<T> optionalEntity = repository.findById(id);
+        return optionalEntity.orElse(null);
     }
 
     @Override

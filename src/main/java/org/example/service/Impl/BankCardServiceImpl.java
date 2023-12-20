@@ -6,10 +6,6 @@ import org.example.entity.Student;
 import org.example.repository.BankCardRepository;
 import org.example.service.BankCardService;
 
-import java.util.List;
-import java.util.regex.Pattern;
-
-
 public class BankCardServiceImpl extends BaseServiceImpl<Integer, BankCard, BankCardRepository>
                                implements BankCardService {
 
@@ -30,5 +26,10 @@ public class BankCardServiceImpl extends BaseServiceImpl<Integer, BankCard, Bank
     @Override
     public BankCard findByStudent(Student student,String cardNumber) {
         return repository.findByStudent(student,cardNumber );
+    }
+
+    @Override
+    public boolean findByCcv2AndDate(String cardNumber, int ccv2) {
+        return repository.findByCcv2AndDate(cardNumber,ccv2);
     }
 }

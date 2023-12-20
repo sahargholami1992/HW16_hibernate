@@ -22,11 +22,11 @@ public class StudentMenu {
     String password;
 
     public void displayMenu(){
-        System.out.println("Student management");
+        System.out.println("******************Student management*******************");
         System.out.println("1.register your account");
-        System.out.println("2. get user name and password");
+        System.out.println("2.get user name and password");
         System.out.println("3.log in");
-        System.out.println("4.log out");
+        System.out.println("4.back");
         System.out.println("enter your select");
     }
     public void runMenu(){
@@ -34,37 +34,52 @@ public class StudentMenu {
         do {
             displayMenu();
             select = input();
-            sc.nextLine();
             switch (select) {
                 case 1 -> studentRegister();
                 case 2 -> getPassword();
                 case 3 -> studentLogIn();
-                case 4 -> System.out.println("exiting the program!! see you later!");
+                case 4 -> {
+                    MainMenu mainMenu = new MainMenu();
+                    mainMenu.mainMenu();
+                }
                 default -> {
                     System.out.println("invalid select,enter a valid option");
                     runMenu();
                 }
             }
-        }while (select != 4);
+        }while (select != 5);
+        sc.close();
     }
 
     private void studentRegister()  {
         System.out.println("enter your first name");
-        String firstName = sc.next();
+        String firstName = sc.nextLine();
+        while (!Validation.validateString(firstName)){
+            System.out.println("empty field!!!");
+            firstName = sc.nextLine();
+        }
         System.out.println("enter your last name");
-        String lastName = sc.next();
+        String lastName = sc.nextLine();
+        while (!Validation.validateString(lastName)){
+            System.out.println("empty field!!!");
+            lastName = sc.nextLine();
+        }
         System.out.println("enter your father name");
-        String fatherName = sc.next();
+        String fatherName = sc.nextLine();
         System.out.println("enter your mother name");
-        String motherName = sc.next();
+        String motherName = sc.nextLine();
         System.out.println("enter your identity number");
-        String identityNumber = sc.next();
+        String identityNumber = sc.nextLine();
+        while (!Validation.validateString(identityNumber)){
+            System.out.println("empty field!!!");
+            identityNumber = sc.nextLine();
+        }
         System.out.println("enter your national code");
-        String nationalCode = sc.next();
-        while (!Validation.isValidNationalCodeWithRegex(nationalCode)){
+        String nationalCode = sc.nextLine();
+        while (!Validation.isValidNationalCodeAndPostalCodeWithRegex(nationalCode)){
             System.out.println("national code length in invalid");
             System.out.println("enter correct national code!!!!!");
-            nationalCode = sc.next();
+            nationalCode = sc.nextLine();
         }
         System.out.println("enter your birth year");
         int year = input();
@@ -80,19 +95,23 @@ public class StudentMenu {
         }
         System.out.println("enter your birth day");
         int day = input();
-        while (day>32 || day <0){
+        while (day>31 || day <0){
             System.out.println("it dose not current day!!");
             day = input();
         }
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        Date birthDay = calendar.getTime();
+        Date birthDay = Validation.getDate(year, month, day);
         System.out.println("enter your student id");
-        String studentId = sc.next();
+        String studentId = sc.nextLine();
+        while (!Validation.validateString(studentId)){
+            System.out.println("empty field!!!");
+            studentId = sc.nextLine();
+        }
         System.out.println("enter your university name");
-        String universityName = sc.next();
+        String universityName = sc.nextLine();
+        while (!Validation.validateString(universityName)){
+            System.out.println("empty field!!!");
+            universityName = sc.nextLine();
+        }
         System.out.println("enter your university type");
         String uniTypes = """
                 1- DOLLATI_ROOZANEH
@@ -153,38 +172,52 @@ public class StudentMenu {
                 studentRegister();
             }
         }
-        System.out.println("enter your married state");
-        boolean isMarried = sc.nextBoolean();
+        boolean isMarried = Validation.getBooleanInputWithValidation("enter your married state",sc);
+        sc.nextLine();
         String spouseNationalCode = null;
         if (isMarried){
             System.out.println("enter your spouse national code");
-            spouseNationalCode = sc.next();
-            while (!Validation.isValidNationalCodeWithRegex(spouseNationalCode)){
-                System.out.println("password length in invalid");
+            spouseNationalCode = sc.nextLine();
+            while (!Validation.isValidNationalCodeAndPostalCodeWithRegex(spouseNationalCode)){
+                System.out.println("national code length in invalid");
                 System.out.println("enter correct national code!!!!!");
-                spouseNationalCode = sc.next();
+                spouseNationalCode = sc.nextLine();
             }
         }
         System.out.println("enter your city");
-        String city = sc.next();
-        System.out.println("enter your stay in dorm state");
-        boolean stayInDorm = sc.nextBoolean();
+        String city = sc.nextLine();
+        while (!Validation.validateString(city)){
+            System.out.println("empty field!!!");
+            city = sc.nextLine();
+        }
+        boolean stayInDorm = Validation.getBooleanInputWithValidation("enter your stay in dorm state",sc);
         int rental = 0;
         String address = null;
-        int postalCode = 0;
+        String postalCode = null;
         if (!stayInDorm){
             System.out.println("enter your rental housing number");
             rental = input();
             System.out.println("enter your address");
-            address = sc.next();
+            address = sc.nextLine();
+            while (!Validation.validateString(address)){
+                System.out.println("empty field!!!");
+                address = sc.nextLine();
+            }
             System.out.println("enter your postal code");
-            postalCode = input();
+            postalCode = sc.nextLine();
+            while (Validation.isValidNationalCodeAndPostalCodeWithRegex(postalCode)){
+                System.out.println("postal code length in invalid");
+                System.out.println("enter correct postal code!!!!!");
+                postalCode = sc.nextLine();
+            }
+
         }
+
         StudentRegistrationDTO dto =
                 new StudentRegistrationDTO(
                         firstName,lastName,fatherName,motherName,identityNumber,nationalCode,birthDay,studentId,universityName,type,entranceYear,level,isMarried,spouseNationalCode,city,stayInDorm,rental,address,postalCode);
         String password = studentService.studentRegister(dto);
-        System.out.println("you register successfully");
+        System.out.println("************you register successfully***************");
         System.out.println("your password is " + password + " and userName is " + nationalCode);
         runMenu();
     }
@@ -194,7 +227,7 @@ public class StudentMenu {
         System.out.println("enter your password");
         password = sc.next();
         if (studentService.studentLogIn(userName,password)) {
-            System.out.println("successfully logged in");
+            System.out.println("*************successfully logged in*****************");
             Student student = studentService.findByNationalCode(userName);
             SecurityContext.fillContext(student);
             setTime();

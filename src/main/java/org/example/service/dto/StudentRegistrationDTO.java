@@ -38,7 +38,7 @@ public class StudentRegistrationDTO implements Serializable {
     private boolean stayInDorm;
     private int housingRentalNumber;
     private String address;
-    private int postalCode;
+    private String postalCode;
 
 
 
