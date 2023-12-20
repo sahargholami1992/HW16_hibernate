@@ -7,6 +7,8 @@ import org.example.service.StudentService;
 import org.example.service.dto.StudentRegistrationDTO;
 import org.example.utill.ApplicationContext;
 import org.example.utill.SecurityContext;
+import org.example.utill.Validation;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.InputMismatchException;
@@ -59,17 +61,29 @@ public class StudentMenu {
         String identityNumber = sc.next();
         System.out.println("enter your national code");
         String nationalCode = sc.next();
-        while (!studentService.isValidNationalCodeWithRegex(nationalCode)){
+        while (!Validation.isValidNationalCodeWithRegex(nationalCode)){
             System.out.println("national code length in invalid");
             System.out.println("enter correct national code!!!!!");
             nationalCode = sc.next();
         }
         System.out.println("enter your birth year");
         int year = input();
+        while (year>3000 || year <1900){
+            System.out.println("it dose not current year!!");
+            year = input();
+        }
         System.out.println("enter your birth month");
         int month = input();
+        while (month>13 || month <=0){
+            System.out.println("it dose not current month!!");
+            month = input();
+        }
         System.out.println("enter your birth day");
         int day = input();
+        while (day>32 || day <0){
+            System.out.println("it dose not current day!!");
+            day = input();
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.MONTH, month);
@@ -109,6 +123,10 @@ public class StudentMenu {
         }
         System.out.println("enter your entrance year");
         int entranceYear = input();
+        while (entranceYear>3000 || entranceYear <1900){
+            System.out.println("it dose not current year!!");
+            entranceYear = input();
+        }
         System.out.println("enter your educational level");
         String eduLevels = """
                 1- ASSOCIATE
@@ -137,29 +155,38 @@ public class StudentMenu {
         }
         System.out.println("enter your married state");
         boolean isMarried = sc.nextBoolean();
-        System.out.println("enter your spouse national code");
-        String spouseNationalCode = sc.next();
-        while (!studentService.isValidNationalCodeWithRegex(spouseNationalCode)){
-            System.out.println("password length in invalid");
-            System.out.println("enter correct national code!!!!!");
+        String spouseNationalCode = null;
+        if (isMarried){
+            System.out.println("enter your spouse national code");
             spouseNationalCode = sc.next();
+            while (!Validation.isValidNationalCodeWithRegex(spouseNationalCode)){
+                System.out.println("password length in invalid");
+                System.out.println("enter correct national code!!!!!");
+                spouseNationalCode = sc.next();
+            }
         }
         System.out.println("enter your city");
         String city = sc.next();
         System.out.println("enter your stay in dorm state");
         boolean stayInDorm = sc.nextBoolean();
-        System.out.println("enter your rental housing number");
-        int rental = input();
-        System.out.println("enter your address");
-        String address = sc.next();
-        System.out.println("enter your postal code");
-        int postalCode = input();
+        int rental = 0;
+        String address = null;
+        int postalCode = 0;
+        if (!stayInDorm){
+            System.out.println("enter your rental housing number");
+            rental = input();
+            System.out.println("enter your address");
+            address = sc.next();
+            System.out.println("enter your postal code");
+            postalCode = input();
+        }
         StudentRegistrationDTO dto =
                 new StudentRegistrationDTO(
                         firstName,lastName,fatherName,motherName,identityNumber,nationalCode,birthDay,studentId,universityName,type,entranceYear,level,isMarried,spouseNationalCode,city,stayInDorm,rental,address,postalCode);
-            studentService.studentRegister(dto);
-            System.out.println("you register successfully");
-            runMenu();
+        String password = studentService.studentRegister(dto);
+        System.out.println("you register successfully");
+        System.out.println("your password is " + password + " and userName is " + nationalCode);
+        runMenu();
     }
     private void studentLogIn() {
         System.out.println("enter your user name");
@@ -180,10 +207,22 @@ public class StudentMenu {
     public void setTime(){
         System.out.println("enter current year");
         int year = input();
+        while (year>3000 || year <1900){
+            System.out.println("it dose not current year!!");
+            year = input();
+        }
         System.out.println("enter current month");
         int month = input();
+        while (month>13 || month <=0){
+            System.out.println("it dose not current year!!");
+            month = input();
+        }
         System.out.println("enter current day");
         int day = input();
+        while (day>32 || day <0){
+            System.out.println("it dose not current year!!");
+            day = input();
+        }
         Calendar instance = Calendar.getInstance();
         instance.set(year, month, day);
         Date currentTime = instance.getTime();

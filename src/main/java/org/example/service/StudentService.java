@@ -6,8 +6,8 @@ import org.example.service.dto.StudentRegistrationDTO;
 
 
 public interface StudentService extends BaseService<Integer, Student> {
-    void studentRegister(StudentRegistrationDTO dto);
+    String studentRegister(StudentRegistrationDTO dto);
     Student findByNationalCode(String nationalCode);
     boolean studentLogIn(String userName,String password);
-    boolean isValidNationalCodeWithRegex(String nationalCode);
+
 }
