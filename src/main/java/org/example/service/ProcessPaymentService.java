@@ -11,9 +11,7 @@ import java.util.List;
 
 
 public interface ProcessPaymentService extends BaseService<Integer, ProcessPayment> {
-//    void processRepayment(Loan loan);
     List<ProcessPayment> generateInstallment(Loan loan);
-    boolean activationRepayment(Student student,Date currentDate);
     List<Object[]> findByPending(Loan loan);
     List<Object[]> findByPaid(Loan loan);
     List<ProcessPayment> findByLoan(Integer loanId);

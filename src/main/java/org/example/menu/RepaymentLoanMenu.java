@@ -3,10 +3,13 @@ package org.example.menu;
 
 import org.example.entity.Loan;
 import org.example.entity.Student;
+import org.example.service.BankCardService;
 import org.example.service.LoanService;
 import org.example.service.ProcessPaymentService;
 import org.example.utill.ApplicationContext;
 import org.example.utill.SecurityContext;
+import org.example.utill.Validation;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.InputMismatchException;
@@ -17,6 +20,7 @@ public class RepaymentLoanMenu {
     private final Scanner sc = new Scanner(System.in);
     LoanService loanService = ApplicationContext.getStudentLoanService();
     ProcessPaymentService processPaymentService = ApplicationContext.getProcessPaymentService();
+    BankCardService bankCardService  = ApplicationContext.getBankCardService();
     public void paymentSystem(){
         System.out.println("enter your select");
         System.out.println("1. register payment");
@@ -37,7 +41,7 @@ public class RepaymentLoanMenu {
     public void registerRepayment() {
         Student student = SecurityContext.getCurrentStudent();
         Date currentTime = SecurityContext.getCurrentTime();
-        if (processPaymentService.activationRepayment(student,currentTime)){
+        if (Validation.activationRepayment(student,currentTime)){
             loanService.findAllByNationalCode(student.getNationalCode()).forEach(System.out::println);
             System.out.println("enter loan id");
             int loanId = input();
@@ -76,6 +80,11 @@ public class RepaymentLoanMenu {
         Loan loan = SecurityContext.getCurrentLoan();
         System.out.println("enter your card number");
         String cardNumber = sc.next();
+        while (!Validation.isValidCardNumberWithRegex(cardNumber)){
+            System.out.println("card number length in invalid");
+            System.out.println("enter correct card number!!!!!");
+            cardNumber = sc.next();
+        }
         System.out.println("enter ccv2");
         int ccv2 = input();
         System.out.println("enter Card Expiration Date");

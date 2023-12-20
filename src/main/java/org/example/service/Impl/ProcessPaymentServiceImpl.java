@@ -25,13 +25,8 @@ public class ProcessPaymentServiceImpl extends BaseServiceImpl<Integer, ProcessP
         super(repository);
         this.loanService = loanService;
     }
-//    @Override
-//    public void processRepayment(Loan loan) {
-//        ProcessPayment repayment = new ProcessPayment();
-//        repayment.setLoan(loan);
-//        repayment.setRepaymentDate(repaymentDate(loan.getStudent()));
-//        generateInstallment(loan);
-//    }
+
+
     @Override
     public List<ProcessPayment> generateInstallment(Loan loan) {
         List<ProcessPayment> installments = new ArrayList<>();
@@ -93,37 +88,6 @@ public class ProcessPaymentServiceImpl extends BaseServiceImpl<Integer, ProcessP
         calendar.setTime(repayment.getDueDate());
         calendar.add(Calendar.MONTH, 1);
         return calendar.getTime();
-    }
-
-    public boolean activationRepayment(Student student,Date currentDate){
-        LocalDate localDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        switch (student.getEducationLevel()) {
-            case ASSOCIATE ,BACHELOR_DISCONTINUOUS , MASTER_DISCONTINUOUS -> {
-                if (localDate.getYear()<=student.getEntranceYear()+2){
-                    return false;
-                }
-            }
-            case BACHELOR -> {
-                if (localDate.getYear()<=student.getEntranceYear()+4) {
-                    return false;
-                }
-            }
-//            case BACHELOR_DISCONTINUOUS ->
-            case MASTER -> {
-                if (localDate.getYear()<=student.getEntranceYear()+6) {
-                    return false;
-                }
-            }
-//            case MASTER_DISCONTINUOUS ->
-            case DOCTORATE , PHD-> {
-                if (localDate.getYear()<=student.getEntranceYear()+5) {
-                    return false;
-                }
-            }
-//            case PHD ->
-            default -> throw new IllegalArgumentException("Unsupported level type: " + student.getEducationLevel());
-        }
-        return true;
     }
 
     @Override
