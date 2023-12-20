@@ -25,20 +25,19 @@ public class ApplicationContext {
     private static final LoanService STUDENT_LOAN_SERVICE;
     private static final StudentService STUDENT_SERVICE;
     private static final ProcessPaymentService PROCESS_PAYMENT_SERVICE;
-//    private static final InstallmentService INSTALLMENT_SERVICE;
+
     private static final BankCardService BANK_CARD_SERVICE;
 
     static {
         STUDENT_LOAN_REPOSITORY = new LoanRepositoryImpl(entityManager);
         PROCESS_PAYMENT_REPOSITORY = new ProcessPaymentRepositoryImpl(entityManager);
         STUDENT_REPOSITORY = new StudentRepositoryImpl(entityManager);
-//        INSTALLMENT_REPOSITORY = new InstallmentRepositoryImpl(entityManager);
         BANK_CARD_REPOSITORY = new BankCardRepositoryImpl(entityManager);
         STUDENT_SERVICE = new StudentServiceImpl(STUDENT_REPOSITORY);
-//        INSTALLMENT_SERVICE = new InstallmentServiceImpl(INSTALLMENT_REPOSITORY);
-        STUDENT_LOAN_SERVICE = new LoanServiceImpl(STUDENT_LOAN_REPOSITORY,STUDENT_SERVICE);
-        PROCESS_PAYMENT_SERVICE = new ProcessPaymentServiceImpl(PROCESS_PAYMENT_REPOSITORY,STUDENT_LOAN_SERVICE);
         BANK_CARD_SERVICE = new BankCardServiceImpl(BANK_CARD_REPOSITORY);
+        STUDENT_LOAN_SERVICE = new LoanServiceImpl(STUDENT_LOAN_REPOSITORY,STUDENT_SERVICE,BANK_CARD_SERVICE);
+        PROCESS_PAYMENT_SERVICE = new ProcessPaymentServiceImpl(PROCESS_PAYMENT_REPOSITORY,STUDENT_LOAN_SERVICE);
+
 
 
     }
@@ -50,9 +49,7 @@ public class ApplicationContext {
     public static StudentService getStudentService(){
         return STUDENT_SERVICE;
     }
-//    public static InstallmentService getInstallmentService(){
-//        return INSTALLMENT_SERVICE;
-//    }
+
     public static BankCardService getBankCardService(){
         return BANK_CARD_SERVICE;
     }
