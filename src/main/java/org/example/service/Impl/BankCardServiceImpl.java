@@ -2,9 +2,11 @@ package org.example.service.Impl;
 
 import org.example.base.service.BaseServiceImpl;
 import org.example.entity.BankCard;
+import org.example.entity.Student;
 import org.example.repository.BankCardRepository;
 import org.example.service.BankCardService;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 
@@ -16,19 +18,17 @@ public class BankCardServiceImpl extends BaseServiceImpl<Integer, BankCard, Bank
     }
 
     @Override
-    public void withdraw(double amount,String cardNumber) {
+    public void deposit(double amount,String cardNumber) {
         repository.update(amount,cardNumber);
-    }
-
-    @Override
-    public boolean isValidCardNumberWithRegex(String cardNumber) {
-        Pattern pattern =
-                Pattern.compile("^[0-9]{16}$");
-        return cardNumber.matches(pattern.pattern());
     }
 
     @Override
     public void registerBankCard(BankCard bankCard) {
         repository.saveOrUpdate(bankCard);
+    }
+
+    @Override
+    public BankCard findByStudent(Student student,String cardNumber) {
+        return repository.findByStudent(student,cardNumber );
     }
 }
